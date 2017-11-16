@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="valenciaprogrammers.com.waterapp.AboutActivity">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="About"
+        android:textStyle="bold"
+        android:textColor="@android:color/holo_blue_bright"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="353dp"
+        android:layout_height="443dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/transparent"
+        android:ems="10"
+        android:enabled="false"
+        android:gravity="top"
+        android:inputType="textMultiLine"
+        android:text="Wai-Kai app is to inform people about the water levels in the region. This will mostly be aimed to people who are working around water, such as fishermen, divers, weather forecasters, and much more. For the next months into the app, we want to mainly focus on the GUI so that the user can be able to navigate the app easily, rather than making it an unfamiliar setting, making the user feel lost, and probably lose interest. We want exceptional, yet simple design for the user, and doing that can be accomplished by good programming on all functions, even layouts for the functions, and nice graphics for the layout. If we make the GUI as a priority, it can make the main activity much more functional because we can easily link the functions to the right areas in the main activity. For example, one component of the GUI is to have a search feature. Having a search feature is good when you don’t exactly know where one place is. So searching for, let’s say, the water level of the county of Sarasota in Florida, will zoom in on the county, and showing me map indicators of water levels in the county. "
+        android:textColor="@android:color/holo_blue_bright"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.516"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintVertical_bias="0.538" />
+</android.support.constraint.ConstraintLayout>
