@@ -16,4 +16,5 @@
         completions."
     </string>
     <string name="title_activity_start">StartActivity</string>
+    <string name="mylocation">my location</string>
 </resources>

@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,10 +41,11 @@ public class StartActivity extends AppCompatActivity {
     public static double lat;
     public static double lon;
 
-    int cityCounter = 0;
+
 
     AutoCompleteTextView searchBar;
     TextView about;
+    Button myLocation;
 
     int counter = 1;
 
@@ -79,7 +81,7 @@ public class StartActivity extends AppCompatActivity {
         }
 
 
-
+        myLocation = (Button) findViewById(R.id.myLocation);
         searchBar = (AutoCompleteTextView) findViewById(R.id.searchCounty);
         searchBar.setAdapter(adapter);
         about = (TextView) findViewById(R.id.aboutActivator);
@@ -100,6 +102,15 @@ public class StartActivity extends AppCompatActivity {
                     //searchBar.setFocusable(false);
                 }
 
+            }
+        });
+
+        myLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(StartActivity.this, StationsMapsActivity.class);
+                startActivity(i);
+                StationsMapsActivity.myLocation = true;
             }
         });
 
@@ -159,7 +170,7 @@ public class StartActivity extends AppCompatActivity {
                     }
                 }
 
-                searchBar.setText(" ");
+                searchBar.setText("");
 
 
                 Intent i = new Intent(StartActivity.this, StationsMapsActivity.class);
