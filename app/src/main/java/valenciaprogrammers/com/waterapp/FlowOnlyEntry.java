@@ -5,13 +5,10 @@ package valenciaprogrammers.com.waterapp;
  */
 
 public class FlowOnlyEntry {
-//    public final String date;
     public final String flow;
 
 
-
     public FlowOnlyEntry(String flow) {
-//        this.date = date;
         this.flow = flow;
 
     }

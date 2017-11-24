@@ -1,46 +1,50 @@
 package valenciaprogrammers.com.waterapp;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Build;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import android.view.WindowManager;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 
-public class StationsMapsActivity extends FragmentActivity implements OnMapReadyCallback {
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+public class StationsMapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
 
     private GoogleMap mMap;
-    public static boolean myLocation = false;
 
-    private Location location;
-    private LocationManager locationManager;
+    GoogleMap googleMap;
+    SupportMapFragment mapFragment;
+    String URL = "https://waterservices.usgs.gov/nwis/iv/?format=waterml,2.0&stateCd=fl&parameterCd=00060,00065&siteType=LK,ST,ST-CA,ST-DCH,ST-TS,SP&siteStatus=active";
 
-    private double myLat, myLon;
+    String URLGraph;
+    ArrayList<NameCoordsEntry> entries;
+    ArrayList<FlowOnlyEntry> flowOnlyEntries;
+    ArrayList<DateEntry> dateOnlyEntries;
+    ArrayList<SiteEntry> siteOnlyEntries;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,39 +53,10 @@ public class StationsMapsActivity extends FragmentActivity implements OnMapReady
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+
         mapFragment.getMapAsync(this);
 
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-
-
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-            location = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
-            myLat = location.getLatitude();
-            myLon = location.getLongitude();
-
-
-
-
-
-
-
-
     }
-
-
-
 
     /**
      * Manipulates the map once available.
@@ -96,95 +71,148 @@ public class StationsMapsActivity extends FragmentActivity implements OnMapReady
     public void onMapReady(GoogleMap googleMap) {
 
         mMap = googleMap;
-        mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+
+        this.googleMap = googleMap;
 
         // Adds focal point to map so that Florida is centered on the screen
 //        LatLng focalPoint = new LatLng(28.468357, -83.331241);
 //        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom((focalPoint), 5.8f));
-        if (myLocation) {
-            zoomInOnCoord(myLat, myLon);
-            System.out.println(myLat + " " + myLon);
-        } else {
-            zoomInOnCoord(StartActivity.lat, StartActivity.lon);
+
+        zoomInOnCoord(StartActivity.lat, StartActivity.lon);
+
+        new DownloadXML().execute(URL);
+    }
+
+    private class DownloadXML extends AsyncTask<String, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
         }
 
+        @Override
+        protected Void doInBackground(String... Url) {
 
-        // this code saves the webpage as an xml file. the file is saved internally
-        // and is replaced everytime users calls for this data type. The data pulled
-        // at the request is the most recent data available from USGS.
-        //Note: This code has not been tested/finalized yet.
+            try {
+                URL url = new URL(Url[0]);
+                DocumentBuilderFactory dbf = DocumentBuilderFactory
+                        .newInstance();
+                DocumentBuilder db = dbf.newDocumentBuilder();
+                // Download the XML file
+                Document doc = db.parse(new InputSource(url.openStream()));
+                doc.getDocumentElement().normalize();
+                // Locate the Tag Name
+//                nodelist = doc.getElementsByTagName("item");
 
-        try {
-            OutputStream out = new FileOutputStream("/Users/nayala2/Documents");
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                Source xmlSource = new DOMSource(doc);
+                javax.xml.transform.Result outputTarget = new StreamResult(outputStream);
+                TransformerFactory.newInstance().newTransformer().transform(xmlSource, outputTarget);
 
-            URL url = new URL("http://www.oracle.com/technetwork/java/index.html");
-            URLConnection conn = url.openConnection();
-            conn.connect();
-            InputStream is = conn.getInputStream();
+                InputStream is = new ByteArrayInputStream(outputStream.toByteArray());
+                entries = new NameCoordsParsing().parse(is);
 
-            copy(is, out);
-            is.close();
-            out.close();
-        } catch (FileNotFoundException fnfe) {
-            fnfe.printStackTrace();
-        } catch (IOException io) {
-            io.printStackTrace();
+                InputStream is2 = new ByteArrayInputStream(outputStream.toByteArray());
+                flowOnlyEntries = new FlowOnlyParsing().parse(is2);
+
+                InputStream is3 = new ByteArrayInputStream(outputStream.toByteArray());
+                dateOnlyEntries = new DateOnlyParsing().parse(is3);
+
+                InputStream is4 = new ByteArrayInputStream(outputStream.toByteArray());
+                siteOnlyEntries = new SiteOnlyParsing().parse(is4);
+
+
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return null;
         }
 
-        //this code opens the xml file for parsing by the appropriate methods
-        //then saves the output into an array. Then the coordinates are converted
-        //to doubles, then LatLng. The station name is edited to remove extra text,
-        //and the flow is presented with its unit of measurement.
-        //These are used to generate markers on the map as the method loops through
-        //the arrays.
-        //Note: I need to add the date to the markers.
+        @Override
+        protected void onPostExecute(Void args) {
 
-        try {
-            InputStream is = StationsMapsActivity.this.getResources()
-                    .getAssets().open("streamflow.xml");
-            ArrayList<NameCoordsEntry> entries = new NameCoordsParsing().parse(is);
-
-            InputStream is2 = StationsMapsActivity.this.getResources()
-                    .getAssets().open("streamflow.xml");
-            ArrayList<FlowOnlyEntry> flowOnlyEntries = new FlowOnlyParsing().parse(is2);
-
-            for(int i=0;i<entries.size() && i < flowOnlyEntries.size();i++) {
+            for (int i = 0; i < entries.size() && i < flowOnlyEntries.size() && i < dateOnlyEntries.size(); i++) {
 
                 String[] latlong = entries.get(i).coordinates.split(" ");
                 double latitude = Double.parseDouble(latlong[0]);
                 double longitude = Double.parseDouble(latlong[1]);
                 LatLng lng = new LatLng(latitude, longitude);
 
-//                    Log.d("I made it here", flow);
+                String stationName = entries.get(i).siteName;
+                String flow = flowOnlyEntries.get(i).flow;
+                String date = dateOnlyEntries.get(i).date;
+                String siteID = siteOnlyEntries.get(i).site;
+                Log.d("doInBackground: ", "did I make it here???");
 
-                String remove = "Timeseries collected at ";
-                String stationName = entries.get(i).siteName.replace(remove, "");
+                Marker destination = googleMap.addMarker(new MarkerOptions()
+                        .position(lng)
+                        .title(stationName)
+                        .snippet("Flow: " + flow + " ft3/s  " + "Date: " + date
+                                + "\nSite ID: " + siteID)
 
-                    //                Log.d("flow:.....", stationName);
+                );
 
-                    String flow = flowOnlyEntries.get(i).flow;
 
-                    Marker destination = googleMap.addMarker(new MarkerOptions()
-                            .position(lng)
-                            .title(stationName)
-                            .snippet("Flow: " + flow + " ft3/s")
-                    );
+                destination.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.liquid));
+
             }
 
-        } catch (IOException ie) {
-            ie.printStackTrace();
+
+            mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                @Override
+                public void onInfoWindowClick(Marker marker) {
+                    String fullSnippet = marker.getSnippet();
+                    String[] splitSnippet = fullSnippet.split("Date: ");
+                    String snippet = splitSnippet[1];
+                    String[] snippetSplit = snippet.split("Site ID: ");
+                    String markerDate = snippetSplit[0];
+                    Log.d("markerDate: ", markerDate + "test");
+                    String siteID = snippetSplit[1];
+
+                    String coordinates = marker.getPosition().toString();
+
+                    String[] dateSplit = markerDate.split("-");
+                    int month = Integer.parseInt(dateSplit[1]);
+                    int year = Integer.parseInt(dateSplit[0]);
+
+                    int previousMonth;
+                    int previousYear;
+
+
+                    if (month != 1) {
+                        previousMonth = month - 1;
+                        URLGraph = "https://waterservices.usgs.gov/nwis/iv/?format=waterml,2.0&sites=" + siteID + "&startDT=" + year + "-" + previousMonth + "-28" + "&endDT=" + markerDate + "&parameterCd=00065&siteType=ES,LK,ST,ST-CA,ST-DCH,ST-TS,SP&siteStatus=active";
+                        String URLGraph2 = URLGraph.replace("\n", "").replace("\r", "");
+                        Log.d("url", URLGraph2);
+                        Intent intent = new Intent(StationsMapsActivity.this, GraphActivity.class);
+
+                        intent.putExtra("key", URLGraph2);
+                        startActivity(intent);
+
+                    } else {
+                        previousMonth = 12;
+                        previousYear = year - 1;
+                        URLGraph = "https://waterservices.usgs.gov/nwis/iv/?format=waterml,2.0&sites=" + siteID + "&startDT=" + previousYear + "-" + previousMonth + "-28" + "&endDT=" + markerDate + "&parameterCd=00065&siteType=ES,LK,ST,ST-CA,ST-DCH,ST-TS,SP&siteStatus=active";
+                        String URLGraph2 = URLGraph.replace("\n", "").replace("\r", "");
+                        Log.d("url", URLGraph2);
+                        Intent intent = new Intent(StationsMapsActivity.this, GraphActivity.class);
+
+                        intent.putExtra("key", URLGraph2);
+                        startActivity(intent);
+                    }
+
+
+                }
+            });
+
         }
     }
 
-    private static void copy(InputStream from, OutputStream to) throws IOException {
-        byte[] buffer = new byte[4096];
-        while (true) {
-            int numBytes = from.read(buffer);
-            if (numBytes == -1) {
-                break;
-            }
-            to.write(buffer, 0, numBytes);
-        }
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+
     }
 
     public void zoomInOnCoord(double lat, double lon) {
@@ -201,12 +229,9 @@ public class StationsMapsActivity extends FragmentActivity implements OnMapReady
     }
 
 
-
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         finish();
     }
-
 }

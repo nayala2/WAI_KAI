@@ -19,8 +19,7 @@ import java.util.ArrayList;
 public class NameCoordsParsing {
     private static final String ns = null;
 
-    public ArrayList<NameCoordsEntry> parse(InputStream in)
-    {
+    public ArrayList<NameCoordsEntry> parse(InputStream in) {
         ArrayList<NameCoordsEntry> list = null;
 
         try {
@@ -28,22 +27,20 @@ public class NameCoordsParsing {
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             parser.setInput(in, null);
             parser.nextTag();
-            list=readFeed(parser);
-            for(int i=0;i<list.size();i++)
-            {
-                Log.i(".......",list.get(i).coordinates);
-                Log.i(".......",list.get(i).siteName);
-                Log.i(".......",list.get(i).flow);
-//                Log.i(".......",list.get(i).date);
+            list = readFeed(parser);
+            for (int i = 0; i < list.size(); i++) {
+                Log.i(i + ".......", list.get(i).coordinates);
+                Log.i(i + ".......", list.get(i).siteName);
             }
-        } catch(Exception e){
+        } catch (Exception e) {
 
         }
         return list;
     }
-    private  ArrayList<NameCoordsEntry> readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
 
-        ArrayList<NameCoordsEntry> streamFlowEntry= new ArrayList<NameCoordsEntry>();
+    private ArrayList<NameCoordsEntry> readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
+
+        ArrayList<NameCoordsEntry> streamFlowEntry = new ArrayList<NameCoordsEntry>();
         parser.require(XmlPullParser.START_TAG, ns, "gml:FeatureCollection");
         while (parser.next() != XmlPullParser.END_DOCUMENT) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -59,11 +56,11 @@ public class NameCoordsParsing {
         }
         return streamFlowEntry;
     }
+
     private NameCoordsEntry readMarker(XmlPullParser parser) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, "gml:featureMember");
         String coordinates = null;
         String siteName = null;
-        String flow =null;
 
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -73,19 +70,19 @@ public class NameCoordsParsing {
 
             if (name.equals("wml2:Collection")) {
                 siteName = readName(parser);
-            } else if(name.equals("wml2:observationMember")) {
+            } else if (name.equals("wml2:observationMember")) {
                 coordinates = readCoordinates(parser);
             } else {
                 skip(parser);
             }
         }
-        return new NameCoordsEntry(coordinates, siteName, flow);
+        return new NameCoordsEntry(coordinates, siteName);
 
     }
+
     private String readCoordinates(XmlPullParser parser) throws IOException, XmlPullParserException {
 
         String coordinates = null;
-        String flow = null;
 
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -96,24 +93,19 @@ public class NameCoordsParsing {
 
             if (name.equals("om:OM_Observation")) {
                 coordinates = nextLevelCoords(parser);
-                String coordinatesAndFlow = coordinates + " " + flow;
-                return coordinatesAndFlow;
+                return coordinates;
             } else {
                 skip(parser);
-            }        }
+            }
+        }
         return coordinates;
     }
-    private String readLng(XmlPullParser parser) throws IOException, XmlPullParserException {
+
+    private String readSiteName(XmlPullParser parser) throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, ns, "gml:name");
         String siteName = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, "gml:name");
         return siteName;
-    }
-    private String readIcon(XmlPullParser parser) throws IOException, XmlPullParserException {
-        parser.require(XmlPullParser.START_TAG, ns, "wml2:value");
-        String flow = readText(parser);
-        parser.require(XmlPullParser.END_TAG, ns, "wml2:value");
-        return flow;
     }
 
     private String readCoords(XmlPullParser parser) throws IOException, XmlPullParserException {
@@ -137,7 +129,9 @@ public class NameCoordsParsing {
             if (!(name.equals("gml:name"))) {
                 skip(parser);
             } else {
-                siteName = readLng(parser);
+                String fullSiteName = readSiteName(parser);
+                String remove = "Timeseries collected at ";
+                siteName = fullSiteName.replace(remove, "");
                 return siteName;
             }
         }
@@ -158,7 +152,7 @@ public class NameCoordsParsing {
             if (!(name.equals("om:featureOfInterest"))) {
                 skip(parser);
             } else {
-                 coords = readNextLevelCoords2(parser);
+                coords = readNextLevelCoords2(parser);
                 return coords;
             }
         }
@@ -219,7 +213,7 @@ public class NameCoordsParsing {
                 skip(parser);
             } else {
                 coords = readNextLevelCoords5(parser);
-                Log.d("all done", name);
+//                Log.d("all done", name);
                 return coords;
             }
         }
@@ -256,6 +250,7 @@ public class NameCoordsParsing {
         }
         return result;
     }
+
     private void skip(XmlPullParser parser) throws XmlPullParserException, IOException {
         if (parser.getEventType() != XmlPullParser.START_TAG) {
             throw new IllegalStateException();

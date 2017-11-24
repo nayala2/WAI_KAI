@@ -7,13 +7,11 @@ package valenciaprogrammers.com.waterapp;
 public class NameCoordsEntry {
     public final String coordinates;
     public final String siteName;
-    public final String flow;
 
 
-    public NameCoordsEntry(String coordinates, String siteName, String flow) {
+    public NameCoordsEntry(String coordinates, String siteName) {
         this.coordinates = coordinates;
         this.siteName = siteName;
-        this.flow = flow;
 
     }
 }

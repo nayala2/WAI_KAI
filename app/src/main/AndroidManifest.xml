@@ -53,6 +53,8 @@
         <activity
             android:name=".AboutActivity"
             android:screenOrientation="portrait"/>
+        <activity android:name=".GraphActivity" />
+        <activity android:name=".ChooseTypeActivity"></activity>
     </application>
 
 </manifest>

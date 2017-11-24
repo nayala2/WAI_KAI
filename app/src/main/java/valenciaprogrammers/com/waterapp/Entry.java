@@ -10,7 +10,7 @@ public class Entry {
     public final String icon;
 
 
-    public Entry(String lat, String lng,String icon) {
+    public Entry(String lat, String lng, String icon) {
         this.lat = lat;
         this.lng = lng;
         this.icon = icon;

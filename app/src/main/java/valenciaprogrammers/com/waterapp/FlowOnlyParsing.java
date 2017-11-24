@@ -16,8 +16,7 @@ import java.util.ArrayList;
 public class FlowOnlyParsing {
     private static final String ns = null;
 
-    public ArrayList<FlowOnlyEntry> parse(InputStream in)
-    {
+    public ArrayList<FlowOnlyEntry> parse(InputStream in) {
         ArrayList<FlowOnlyEntry> list = null;
 
         try {
@@ -25,17 +24,17 @@ public class FlowOnlyParsing {
             flowParser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             flowParser.setInput(in, null);
             flowParser.nextTag();
-            list=readFeed(flowParser);
-            for(int j=0;j<list.size();j++)
-            {
-                Log.i(j + ".......",list.get(j).flow);
+            list = readFeed(flowParser);
+            for (int j = 0; j < list.size(); j++) {
+                Log.i(j + ".......", list.get(j).flow);
             }
-        } catch(Exception e){
+        } catch (Exception e) {
 
         }
         return list;
     }
-    private  ArrayList<FlowOnlyEntry> readFeed(XmlPullParser flowParser) throws XmlPullParserException, IOException {
+
+    private ArrayList<FlowOnlyEntry> readFeed(XmlPullParser flowParser) throws XmlPullParserException, IOException {
 
         ArrayList<FlowOnlyEntry> flowOnlyEntry = new ArrayList<FlowOnlyEntry>();
         flowParser.require(XmlPullParser.START_TAG, ns, "gml:FeatureCollection");
@@ -53,10 +52,11 @@ public class FlowOnlyParsing {
         }
         return flowOnlyEntry;
     }
+
     private FlowOnlyEntry readMarker(XmlPullParser flowParser) throws XmlPullParserException, IOException {
         flowParser.require(XmlPullParser.START_TAG, ns, "gml:featureMember");
 
-        String flow =null;
+        String flow = null;
 
         while (flowParser.next() != XmlPullParser.END_TAG) {
             if (flowParser.getEventType() != XmlPullParser.START_TAG) {
@@ -68,7 +68,7 @@ public class FlowOnlyParsing {
                 skip(flowParser);
             } else {
                 flow = readFlow(flowParser);
-                Log.d("flow.........", flow);
+//                Log.d("flow.........", flow);
             }
         }
         return new FlowOnlyEntry(flow);
@@ -92,7 +92,8 @@ public class FlowOnlyParsing {
                 return flow;
             } else {
                 skip(flowParser);
-            }        }
+            }
+        }
         return flow;
     }
 
@@ -112,7 +113,8 @@ public class FlowOnlyParsing {
                 return flow;
             } else {
                 skip(flowParser);
-            }        }
+            }
+        }
         return flow;
     }
 
@@ -217,8 +219,6 @@ public class FlowOnlyParsing {
                 skip(flowParser);
             } else {
                 flow = finalFlow(flowParser);
-                String tag = XmlPullParser.END_TAG + "'";
-                String tag1 = XmlPullParser.START_TAG + "'";
 
                 return flow;
             }
@@ -227,8 +227,6 @@ public class FlowOnlyParsing {
     }
 
     private String finalFlow(XmlPullParser flowParser) throws IOException, XmlPullParserException {
-        String name = flowParser.getName();
-        flowParser.require(XmlPullParser.START_TAG, ns, "wml2:value");
         String flow = readText(flowParser);
         flowParser.require(XmlPullParser.END_TAG, ns, "wml2:value");
         return flow;
@@ -242,6 +240,7 @@ public class FlowOnlyParsing {
         }
         return result;
     }
+
     private void skip(XmlPullParser flowParser) throws XmlPullParserException, IOException {
         if (flowParser.getEventType() != XmlPullParser.START_TAG) {
             throw new IllegalStateException();

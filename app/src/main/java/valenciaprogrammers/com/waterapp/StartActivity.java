@@ -3,10 +3,7 @@ package valenciaprogrammers.com.waterapp;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Debug;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -16,7 +13,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class StartActivity extends AppCompatActivity {
 
@@ -105,14 +100,14 @@ public class StartActivity extends AppCompatActivity {
             }
         });
 
-        myLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(StartActivity.this, StationsMapsActivity.class);
-                startActivity(i);
-                StationsMapsActivity.myLocation = true;
-            }
-        });
+//        myLocation.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent i = new Intent(StartActivity.this, StationsMapsActivity.class);
+//                startActivity(i);
+//                StationsMapsActivity.myLocation = true;
+//            }
+//        });
 
         about.setOnClickListener(new View.OnClickListener() {
             @Override

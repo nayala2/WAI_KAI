@@ -16,8 +16,7 @@ import java.util.ArrayList;
 public class ParserParsing {
     private static final String ns = null;
 
-    public ArrayList<Entry> parse(InputStream in)
-    {
+    public ArrayList<Entry> parse(InputStream in) {
         ArrayList<Entry> list = null;
 
         try {
@@ -25,28 +24,28 @@ public class ParserParsing {
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             parser.setInput(in, null);
             parser.nextTag();
-            list=readFeed(parser);
-            for(int i=0;i<list.size();i++)
-            {
-                Log.i(".......",list.get(i).lat);
-                Log.i(".......",list.get(i).lng);
-                Log.i(".......",list.get(i).icon);
+            list = readFeed(parser);
+            for (int i = 0; i < list.size(); i++) {
+                Log.i(".......", list.get(i).lat);
+                Log.i(".......", list.get(i).lng);
+                Log.i(".......", list.get(i).icon);
             }
-        } catch(Exception e){
+        } catch (Exception e) {
 
         }
         return list;
     }
-    private  ArrayList<Entry> readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
 
-        ArrayList<Entry> entry= new ArrayList<Entry>();
+    private ArrayList<Entry> readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
+
+        ArrayList<Entry> entry = new ArrayList<Entry>();
         parser.require(XmlPullParser.START_TAG, ns, "mapper");
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
             }
             String name = parser.getName();
-            Log.i("............",name);
+            Log.i("............", name);
             // Starts by looking for the entry tag
             if (name.equals("site")) {
                 entry.add(readMarker(parser));
@@ -56,42 +55,45 @@ public class ParserParsing {
         }
         return entry;
     }
+
     private Entry readMarker(XmlPullParser parser) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, "site");
         String lat = null;
         String lng = null;
-        String icon =null;
+        String icon = null;
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
             }
             String name = parser.getName();
-            Log.i("............",name);
+            Log.i("............", name);
             if (name.equals("lat")) {
                 lat = readLat(parser);
             } else if (name.equals("lng")) {
                 lng = readLng(parser);
             } else if (name.equals("sna")) {
                 icon = readIcon(parser);
-            }
-            else {
+            } else {
                 skip(parser);
             }
         }
-        return new Entry(lat,lng,icon);
+        return new Entry(lat, lng, icon);
     }
+
     private String readLat(XmlPullParser parser) throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, ns, "lat");
         String lat = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, "lat");
         return lat;
     }
+
     private String readLng(XmlPullParser parser) throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, ns, "lng");
         String lng = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, "lng");
         return lng;
     }
+
     private String readIcon(XmlPullParser parser) throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, ns, "sna");
         String icon = readText(parser);
@@ -108,6 +110,7 @@ public class ParserParsing {
         }
         return result;
     }
+
     private void skip(XmlPullParser parser) throws XmlPullParserException, IOException {
         if (parser.getEventType() != XmlPullParser.START_TAG) {
             throw new IllegalStateException();
