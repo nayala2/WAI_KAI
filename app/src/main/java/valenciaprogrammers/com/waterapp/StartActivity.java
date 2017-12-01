@@ -168,7 +168,9 @@ public class StartActivity extends AppCompatActivity {
                 searchBar.setText("");
 
 
-                Intent i = new Intent(StartActivity.this, StationsMapsActivity.class);
+//                Intent i = new Intent(StartActivity.this, StationsMapsActivity.class);
+                Intent i = new Intent(StartActivity.this, ChooseTypeActivity.class);
+
                 startActivity(i);
                 return false;
             }

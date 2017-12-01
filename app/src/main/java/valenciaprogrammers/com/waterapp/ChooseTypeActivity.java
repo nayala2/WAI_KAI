@@ -18,4 +18,9 @@ public class ChooseTypeActivity extends AppCompatActivity {
         Intent intent = new Intent(ChooseTypeActivity.this, StationsMapsActivity.class);
         startActivity(intent);
     }
+
+    public void toMarineMap(View view) {
+        Intent intent = new Intent(ChooseTypeActivity.this, MarineMapsActivity.class);
+        startActivity(intent);
+    }
 }

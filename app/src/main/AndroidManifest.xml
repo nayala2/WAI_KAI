@@ -8,13 +8,14 @@
          location permissions for the 'MyLocation' functionality. 
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -42,8 +43,8 @@
         <activity
             android:name=".StartActivity"
             android:label="@string/title_activity_start"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -52,9 +53,17 @@
         </activity>
         <activity
             android:name=".AboutActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".GraphActivity" />
-        <activity android:name=".ChooseTypeActivity"></activity>
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GraphActivity"
+            android:screenOrientation="landscape" />
+        <activity android:name=".ChooseTypeActivity" />
+        <activity android:name=".MarineMapsActivity" />
+        <activity android:name=".DateRangeActivity"></activity>
+        <activity
+            android:name=".MarineGraphActivity"
+            android:screenOrientation="landscape"></activity>
+
     </application>
 
 </manifest>

@@ -133,6 +133,10 @@ public class StationsMapsActivity extends FragmentActivity implements OnMapReady
         @Override
         protected void onPostExecute(Void args) {
 
+            int size = entries.size();
+
+            Log.d("doInBackground: ", Integer.toString(size));
+
             for (int i = 0; i < entries.size() && i < flowOnlyEntries.size() && i < dateOnlyEntries.size(); i++) {
 
                 String[] latlong = entries.get(i).coordinates.split(" ");
@@ -144,7 +148,6 @@ public class StationsMapsActivity extends FragmentActivity implements OnMapReady
                 String flow = flowOnlyEntries.get(i).flow;
                 String date = dateOnlyEntries.get(i).date;
                 String siteID = siteOnlyEntries.get(i).site;
-                Log.d("doInBackground: ", "did I make it here???");
 
                 Marker destination = googleMap.addMarker(new MarkerOptions()
                         .position(lng)
@@ -168,7 +171,6 @@ public class StationsMapsActivity extends FragmentActivity implements OnMapReady
                     String snippet = splitSnippet[1];
                     String[] snippetSplit = snippet.split("Site ID: ");
                     String markerDate = snippetSplit[0];
-                    Log.d("markerDate: ", markerDate + "test");
                     String siteID = snippetSplit[1];
 
                     String coordinates = marker.getPosition().toString();
