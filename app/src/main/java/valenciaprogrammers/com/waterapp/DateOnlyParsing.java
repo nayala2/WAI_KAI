@@ -220,7 +220,9 @@ public class DateOnlyParsing {
             } else {
                 String fullDate = finalFlow(dateParser);
                 String[] splitDate = fullDate.split("T");
-                date = splitDate[0];
+                //T05:00:00-05:00
+                String[] splitTime = splitDate[1].split(":");
+                date = splitDate[0] + " " + splitTime[0] + ":" + splitTime[1];
                 return date;
             }
         }

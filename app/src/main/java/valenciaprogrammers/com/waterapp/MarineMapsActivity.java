@@ -103,37 +103,6 @@ public class MarineMapsActivity extends FragmentActivity implements OnMapReadyCa
                     Intent intent = new Intent(MarineMapsActivity.this, DateRangeActivity.class);
                     intent.putExtra("key", snippet);
                     startActivity(intent);
-//                    String[] dateSplit = markerDate.split("-");
-//                    int month = Integer.parseInt(dateSplit[1]);
-//                    int year = Integer.parseInt(dateSplit[0]);
-//
-//                    int previousMonth;
-//                    int previousYear;
-//
-//
-//                    if (month != 1) {
-//                        previousMonth = month - 1;
-//                        URLGraph = "https://waterservices.usgs.gov/nwis/iv/?format=waterml,2.0&sites=" + siteID + "&startDT=" + year + "-" + previousMonth + "-28" + "&endDT=" + markerDate + "&parameterCd=00065&siteType=ES,LK,ST,ST-CA,ST-DCH,ST-TS,SP&siteStatus=active";
-//                        String URLGraph2 = URLGraph.replace("\n", "").replace("\r", "");
-//                        Log.d("url", URLGraph2);
-//                        Intent intent = new Intent(MarineMapsActivity.this, GraphActivity.class);
-//
-//                        intent.putExtra("key", URLGraph2);
-//                        startActivity(intent);
-//
-//                    } else {
-//                        previousMonth = 12;
-//                        previousYear = year - 1;
-//                        URLGraph = "https://waterservices.usgs.gov/nwis/iv/?format=waterml,2.0&sites=" + siteID + "&startDT=" + previousYear + "-" + previousMonth + "-28" + "&endDT=" + markerDate + "&parameterCd=00065&siteType=ES,LK,ST,ST-CA,ST-DCH,ST-TS,SP&siteStatus=active";
-//                        String URLGraph2 = URLGraph.replace("\n", "").replace("\r", "");
-//                        Log.d("url", URLGraph2);
-//                        Intent intent = new Intent(MarineMapsActivity.this, GraphActivity.class);
-//
-//                        intent.putExtra("key", URLGraph2);
-//                        startActivity(intent);
-//                    }
-
-
                 }
             });
 
@@ -178,14 +147,12 @@ public class MarineMapsActivity extends FragmentActivity implements OnMapReadyCa
 
     public void zoomInOnCoord(double lat, double lon) {
         LatLng city = new LatLng(lat, lon);
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(city));
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(city)
                 .zoom(10)
                 .bearing(0)
                 .tilt(90)
                 .build();
-        //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 10));
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 3500, null);
     }
 }

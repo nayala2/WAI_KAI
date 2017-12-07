@@ -213,7 +213,6 @@ public class NameCoordsParsing {
                 skip(parser);
             } else {
                 coords = readNextLevelCoords5(parser);
-//                Log.d("all done", name);
                 return coords;
             }
         }
@@ -235,7 +234,6 @@ public class NameCoordsParsing {
             } else {
                 coords = readCoords(parser);
 
-//                Log.d("Coord5.......", name);
                 return coords;
             }
         }

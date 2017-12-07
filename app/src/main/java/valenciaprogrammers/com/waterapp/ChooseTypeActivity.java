@@ -14,11 +14,17 @@ public class ChooseTypeActivity extends AppCompatActivity {
 
     }
 
-    public void toFreshwaterMap(View view) {
+    public void toFreshwaterFlowMap(View view) {
         Intent intent = new Intent(ChooseTypeActivity.this, StationsMapsActivity.class);
+        intent.putExtra("type", "flow");
         startActivity(intent);
     }
 
+    public void toFreshwaterWaterLevelMap(View view) {
+        Intent intent = new Intent(ChooseTypeActivity.this, StationsMapsActivity.class);
+        intent.putExtra("type", "level");
+        startActivity(intent);
+    }
     public void toMarineMap(View view) {
         Intent intent = new Intent(ChooseTypeActivity.this, MarineMapsActivity.class);
         startActivity(intent);

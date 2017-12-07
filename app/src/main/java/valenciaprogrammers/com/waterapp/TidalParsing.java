@@ -28,8 +28,8 @@ public class TidalParsing {
             for (int i = 0; i < list.size(); i++) {
                 Log.i(".......", list.get(i).date);
                 Log.i(".......", list.get(i).tidePrediction);
-//                Log.i(".......", list.get(i).highLow);
             }
+
         } catch (Exception e) {
 
         }
@@ -48,6 +48,7 @@ public class TidalParsing {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
             }
+
             String name = parser.getName();
             Log.i("first..........", name);
 
@@ -55,15 +56,9 @@ public class TidalParsing {
             if (name.equals("pr")) {
 //
                 date = "" + parser.getAttributeValue(0);
-                Log.i("attribute?: ", date);
-
                 tidePrediction = "" + parser.getAttributeValue(1);
-                Log.i("attribute?: ", tidePrediction);
-
-//                highLow = "" + parser.getAttributeValue(2);
-//                Log.i("attribute?: ", highLow);
-//
                 TidalEntry thisone = new TidalEntry(date, tidePrediction);
+
                 entry.add(thisone);
             } else {
                 skip(parser);
@@ -87,26 +82,10 @@ public class TidalParsing {
             Log.i("Attribute name........", name);
 
             if (name.equals("pr")) {
-//                Log.i("attribute?: ", date);
 
                 date = readDate(parser);
-                Log.d("readMarker: ", date);
-
                 tidePrediction = readTide(parser);
-                Log.d("readMarker: ", tidePrediction);
 
-//                highLow = readHighLow(parser);
-//                Log.d("readMarker: ", highLow);
-
-
-//            String t = "" + parser.getAttributeValue(0);
-//            Log.i("attribute?: ", t);
-//            if (name.equals("t")) {
-//                date = readLat(parser);
-//            } else if (name.equals("v")) {
-//                tidePrediction = readLng(parser);
-//            } else if (name.equals("type")) {
-//                highLow = readIcon(parser);
             } else {
                 skip(parser);
             }
@@ -125,22 +104,6 @@ public class TidalParsing {
         String tide = "" + parser.getAttributeValue(1);
 
         return tide;
-    }
-
-    private String readHighLow(XmlPullParser parser) throws IOException, XmlPullParserException {
-        String highLow = "" + parser.getAttributeValue(2);
-
-        return highLow;
-    }
-
-
-    private String readText(XmlPullParser parser) throws IOException, XmlPullParserException {
-        String result = "";
-        if (parser.next() == XmlPullParser.TEXT) {
-            result = parser.getText();
-            parser.nextTag();
-        }
-        return result;
     }
 
     private void skip(XmlPullParser parser) throws XmlPullParserException, IOException {

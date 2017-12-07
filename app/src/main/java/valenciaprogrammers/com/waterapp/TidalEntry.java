@@ -12,7 +12,6 @@ public class TidalEntry {
     public TidalEntry(String date, String tidePrediction) {
         this.date = date;
         this.tidePrediction = tidePrediction;
-//        this.highLow = highLow;
 
     }
 }

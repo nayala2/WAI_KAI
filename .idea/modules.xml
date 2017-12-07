@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/WAI_KAI3.iml" filepath="$PROJECT_DIR$/WAI_KAI3.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/wai-kai.iml" filepath="$PROJECT_DIR$/wai-kai.iml" />
     </modules>
   </component>
 </project>

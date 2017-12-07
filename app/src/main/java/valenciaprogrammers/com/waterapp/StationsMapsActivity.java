@@ -46,18 +46,25 @@ public class StationsMapsActivity extends FragmentActivity implements OnMapReady
     ArrayList<DateEntry> dateOnlyEntries;
     ArrayList<SiteEntry> siteOnlyEntries;
 
+    Bundle bundle;
+    String type;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stations_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+
+        bundle = getIntent().getExtras();
+        type = bundle.getString("type");
+
+        Log.d("onCreate: ", type);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
 
         mapFragment.getMapAsync(this);
 
     }
-
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -76,8 +83,6 @@ public class StationsMapsActivity extends FragmentActivity implements OnMapReady
         this.googleMap = googleMap;
 
         // Adds focal point to map so that Florida is centered on the screen
-//        LatLng focalPoint = new LatLng(28.468357, -83.331241);
-//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom((focalPoint), 5.8f));
 
         zoomInOnCoord(StartActivity.lat, StartActivity.lon);
 
@@ -99,11 +104,10 @@ public class StationsMapsActivity extends FragmentActivity implements OnMapReady
                 DocumentBuilderFactory dbf = DocumentBuilderFactory
                         .newInstance();
                 DocumentBuilder db = dbf.newDocumentBuilder();
+
                 // Download the XML file
                 Document doc = db.parse(new InputSource(url.openStream()));
                 doc.getDocumentElement().normalize();
-                // Locate the Tag Name
-//                nodelist = doc.getElementsByTagName("item");
 
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 Source xmlSource = new DOMSource(doc);
@@ -133,10 +137,6 @@ public class StationsMapsActivity extends FragmentActivity implements OnMapReady
         @Override
         protected void onPostExecute(Void args) {
 
-            int size = entries.size();
-
-            Log.d("doInBackground: ", Integer.toString(size));
-
             for (int i = 0; i < entries.size() && i < flowOnlyEntries.size() && i < dateOnlyEntries.size(); i++) {
 
                 String[] latlong = entries.get(i).coordinates.split(" ");
@@ -152,8 +152,7 @@ public class StationsMapsActivity extends FragmentActivity implements OnMapReady
                 Marker destination = googleMap.addMarker(new MarkerOptions()
                         .position(lng)
                         .title(stationName)
-                        .snippet("Flow: " + flow + " ft3/s  " + "Date: " + date
-                                + "\nSite ID: " + siteID)
+                        .snippet("Click here for Water Level and Flow Data" + "\nSite ID: " + siteID + "Data current as of " + date)
 
                 );
 
@@ -167,36 +166,73 @@ public class StationsMapsActivity extends FragmentActivity implements OnMapReady
                 @Override
                 public void onInfoWindowClick(Marker marker) {
                     String fullSnippet = marker.getSnippet();
-                    String[] splitSnippet = fullSnippet.split("Date: ");
-                    String snippet = splitSnippet[1];
-                    String[] snippetSplit = snippet.split("Site ID: ");
-                    String markerDate = snippetSplit[0];
-                    String siteID = snippetSplit[1];
+                    Log.d("onInfoWindowClick: ", fullSnippet);
+                    String[] splitSnippet = fullSnippet.split("as of ");
+                    String fullMarkerDate = splitSnippet[1];
+                    Log.d("onInfoWindowClick: ", fullMarkerDate);
 
-                    String coordinates = marker.getPosition().toString();
+                    String[] markerDateSplit = fullMarkerDate.split(" ");
+                    String markerDate = markerDateSplit[0];
+                    Log.d("onInfoWindowClick: ", markerDate);
+
+
+                    String remainingSnippet = splitSnippet[0];
+                    Log.d("onInfoWindowClick: ", remainingSnippet);
+
+                    String[] snippetSplit = remainingSnippet.split("ID: ");
+                    String splitID = snippetSplit[1];
+                    Log.d("onInfoWindowClick: ", splitID);
+
+                    String[] siteIDSplit = splitID.split("D");
+                    String siteID = siteIDSplit[0];
+                    Log.d("onInfoWindowClick: ", siteID);
+
 
                     String[] dateSplit = markerDate.split("-");
                     int month = Integer.parseInt(dateSplit[1]);
+                    Log.d("onInfoWindowClick: ", Integer.toString(month));
+
                     int year = Integer.parseInt(dateSplit[0]);
+                    Log.d("onInfoWindowClick: ", Integer.toString(year));
+
+                    int day = Integer.parseInt(dateSplit[2]);
+                    Log.d("onInfoWindowClick: ", Integer.toString(day));
+
 
                     int previousMonth;
                     int previousYear;
+                    int previousDay;
 
 
                     if (month != 1) {
                         previousMonth = month - 1;
-                        URLGraph = "https://waterservices.usgs.gov/nwis/iv/?format=waterml,2.0&sites=" + siteID + "&startDT=" + year + "-" + previousMonth + "-28" + "&endDT=" + markerDate + "&parameterCd=00065&siteType=ES,LK,ST,ST-CA,ST-DCH,ST-TS,SP&siteStatus=active";
-                        String URLGraph2 = URLGraph.replace("\n", "").replace("\r", "");
-                        Log.d("url", URLGraph2);
+                        if (32 > day && day > 28) {
+                            previousDay = 28;
+                        } else {
+                            previousDay = day;
+                        }
+                        Log.d("onInfoWindowClick: ", type);
+                        if (type.equals("flow")) {
+                            URLGraph = "https://waterservices.usgs.gov/nwis/iv/?format=waterml,2.0&sites=" + siteID + "&startDT=" + year + "-" + previousMonth + "-" + previousDay + "&endDT=" + markerDate + "&parameterCd=00060&siteType=ES,LK,ST,ST-CA,ST-DCH,ST-TS,SP&siteStatus=active";
+                        } else if (type.equals("level")) {
+                            URLGraph = "https://waterservices.usgs.gov/nwis/iv/?format=waterml,2.0&sites=" + siteID + "&startDT=" + year + "-" + previousMonth + "-" + previousDay + "&endDT=" + markerDate + "&parameterCd=00065&siteType=ES,LK,ST,ST-CA,ST-DCH,ST-TS,SP&siteStatus=active";
+                        }
+                        Log.d("url", URLGraph);
                         Intent intent = new Intent(StationsMapsActivity.this, GraphActivity.class);
 
-                        intent.putExtra("key", URLGraph2);
+                        intent.putExtra("key", URLGraph);
+                        intent.putExtra("type", type);
                         startActivity(intent);
 
                     } else {
                         previousMonth = 12;
                         previousYear = year - 1;
-                        URLGraph = "https://waterservices.usgs.gov/nwis/iv/?format=waterml,2.0&sites=" + siteID + "&startDT=" + previousYear + "-" + previousMonth + "-28" + "&endDT=" + markerDate + "&parameterCd=00065&siteType=ES,LK,ST,ST-CA,ST-DCH,ST-TS,SP&siteStatus=active";
+                        if (32 > day && day > 28) {
+                            previousDay = 28;
+                        } else {
+                            previousDay = day;
+                        }
+                        URLGraph = "https://waterservices.usgs.gov/nwis/iv/?format=waterml,2.0&sites=" + siteID + "&startDT=" + previousYear + "-" + previousMonth + "-" + previousDay + "&endDT=" + markerDate + "&parameterCd=00065&siteType=ES,LK,ST,ST-CA,ST-DCH,ST-TS,SP&siteStatus=active";
                         String URLGraph2 = URLGraph.replace("\n", "").replace("\r", "");
                         Log.d("url", URLGraph2);
                         Intent intent = new Intent(StationsMapsActivity.this, GraphActivity.class);
@@ -219,14 +255,12 @@ public class StationsMapsActivity extends FragmentActivity implements OnMapReady
 
     public void zoomInOnCoord(double lat, double lon) {
         LatLng city = new LatLng(lat, lon);
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(city));
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(city)
                 .zoom(10)
                 .bearing(0)
                 .tilt(90)
                 .build();
-        //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 10));
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 3500, null);
     }
 

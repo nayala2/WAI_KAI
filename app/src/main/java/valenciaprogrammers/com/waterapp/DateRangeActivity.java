@@ -32,8 +32,6 @@ public class DateRangeActivity extends AppCompatActivity {
         siteID = bundle.getString("key");
         Log.d("onCreate: ", siteID);
 
-//            dateView = (TextView) findViewById(R.id.textView2);
-//            dateView2 = (TextView) findViewById(R.id.textView4);
         getTidalData = (TextView) findViewById(R.id.button4);
 
         getTidalData.setOnClickListener((new View.OnClickListener() {
@@ -47,19 +45,47 @@ public class DateRangeActivity extends AppCompatActivity {
                 endMonth = (EditText) findViewById(R.id.endMonth);
                 endYear = (EditText) findViewById(R.id.endYear);
 
-                String startDate = startYear.getText().toString() + startMonth.getText().toString() + startDay.getText().toString();
-                Log.d("onClick: ", startYear.getText().toString());
-                Log.d("onClick: ", startDay.getText().toString());
-                Log.d("onClick: ", startMonth.getText().toString());
+                String stringStartDay = startDay.getText().toString();
+                String stringStartMonth = startMonth.getText().toString();
+                String stringStartYear = startYear.getText().toString();
+                String stringEndDay = endDay.getText().toString();
+                String stringEndMonth = endMonth.getText().toString();
+                String stringEndYear = endYear.getText().toString();
 
-                String endDate = endYear.getText().toString() + endMonth.getText().toString() + endDay.getText().toString();
+                if ((stringStartDay.length() < 2)) {
+                    Intent dateErrorIntent = new Intent(DateRangeActivity.this, DateErrorActivity.class);
+                    startActivity(dateErrorIntent);
+                } else if ((stringStartMonth.length() < 2)) {
+                    Intent dateErrorIntent = new Intent(DateRangeActivity.this, DateErrorActivity.class);
+                    startActivity(dateErrorIntent);
+                } else if (stringStartYear.length() < 4) {
+                    Intent dateErrorIntent = new Intent(DateRangeActivity.this, DateErrorActivity.class);
+                    startActivity(dateErrorIntent);
+                } else if (stringEndDay.length() < 2) {
+                    Intent dateErrorIntent = new Intent(DateRangeActivity.this, DateErrorActivity.class);
+                    startActivity(dateErrorIntent);
+                } else if (stringEndMonth.length() < 2) {
+                    Intent dateErrorIntent = new Intent(DateRangeActivity.this, DateErrorActivity.class);
+                    startActivity(dateErrorIntent);
+                } else if (stringEndYear.length() < 4) {
+                    Intent dateErrorIntent = new Intent(DateRangeActivity.this, DateErrorActivity.class);
+                    startActivity(dateErrorIntent);
+                } else {
 
-                noaaURL = "https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=" + startDate + "&end_date=" + endDate + "&station=" + siteID + "&product=PREDICTIONS&datum=MHHW&units=english&time_zone=gmt&application=web_services&format=xml";
+                    String startDate = startYear.getText().toString() + startMonth.getText().toString() + startDay.getText().toString();
+                    Log.d("onClick: ", Integer.toString(stringStartDay.length()));
+                    Log.d("onClick: ", startDay.getText().toString());
+                    Log.d("onClick: ", startMonth.getText().toString());
+
+                    String endDate = endYear.getText().toString() + endMonth.getText().toString() + endDay.getText().toString();
+
+                    noaaURL = "https://tidesandcurrents.noaa.gov/api/datagetter?begin_date=" + startDate + "&end_date=" + endDate + "&station=" + siteID + "&product=PREDICTIONS&datum=MLLW&units=english&time_zone=lst_ldt&application=web_services&format=xml";
 
 
-                Intent intent = new Intent(DateRangeActivity.this, MarineGraphActivity.class);
-                intent.putExtra("URL", noaaURL);
-                startActivity(intent);
+                    Intent intent = new Intent(DateRangeActivity.this, MarineGraphActivity.class);
+                    intent.putExtra("URL", noaaURL);
+                    startActivity(intent);
+                }
             }
         }));
     }

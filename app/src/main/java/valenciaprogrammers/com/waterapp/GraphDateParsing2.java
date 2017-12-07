@@ -185,6 +185,9 @@ public class GraphDateParsing2 {
                 String fullDate = finalValue(valueParser);
                 String[] splitDate = fullDate.split("T");
                 date = splitDate[0];
+                //T05:00:00-05:00
+                String[] splitTime = splitDate[1].split(":");
+                date = splitDate[0] + " " + splitTime[0] + ":" + splitTime[1];
 //                Log.d("date.........", date);
 
                 return date;

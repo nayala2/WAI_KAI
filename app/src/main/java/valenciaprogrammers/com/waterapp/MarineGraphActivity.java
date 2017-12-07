@@ -40,11 +40,12 @@ public class MarineGraphActivity extends AppCompatActivity {
 
     GraphView graphView;
     LineGraphSeries<DataPoint> series;
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm");
 
     ArrayList<TidalEntry> tidalEntries;
-//    ArrayList<GraphValueEntry> valueOnlySeries;
-//    ArrayList<GraphNameEntry> nameOnlySeries;
+    ArrayList<ErrorEntry> errorEntries;
+
+    Boolean hilo = false;
 
     ArrayList<String> array3 = new ArrayList<String>();
     ArrayList<String> array4 = new ArrayList<String>();
@@ -103,12 +104,28 @@ public class MarineGraphActivity extends AppCompatActivity {
                 InputStream is = new ByteArrayInputStream(outputStream.toByteArray());
                 tidalEntries = new TidalParsing().parse(is);
 
+                if (tidalEntries == null) {
+                    String errorURL = noaaURL.replace("&units=english", "&units=english&interval=hilo");
+
+                    Log.d("doInBackground: ", errorURL);
+                    url = new URL(errorURL);
+                    dbf = DocumentBuilderFactory
+                            .newInstance();
+                    db = dbf.newDocumentBuilder();
+                    // Download the XML file
+                    doc = db.parse(new InputSource(url.openStream()));
+                    doc.getDocumentElement().normalize();
+
+                    outputStream = new ByteArrayOutputStream();
+                    xmlSource = new DOMSource(doc);
+                    outputTarget = new StreamResult(outputStream);
+                    TransformerFactory.newInstance().newTransformer().transform(xmlSource, outputTarget);
+
+                    is = new ByteArrayInputStream(outputStream.toByteArray());
+                    tidalEntries = new TidalParsing().parse(is);
+                    hilo = true;
+                }
                 Log.d("doInBackground: ", "made it to MarineGraph");
-//                InputStream is1 = new ByteArrayInputStream(outputStream.toByteArray());
-//                valueOnlySeries = new GraphValueParsing().parse(is1);
-//
-//                InputStream is2 = new ByteArrayInputStream(outputStream.toByteArray());
-//                nameOnlySeries = new GraphNameParsing().parse(is2);
 
             } catch (ParserConfigurationException pce) {
                 pce.printStackTrace();
@@ -127,11 +144,8 @@ public class MarineGraphActivity extends AppCompatActivity {
         protected void onPostExecute(Void args) {
 
             Log.d("onPostExecute: ", "made it to post execute");
+
             try {
-//                currentValue = valueOnlySeries.get(valueOnlySeries.size() - 1).value;
-//                currentDate = dateOnlyEntrySeries.get(dateOnlyEntrySeries.size() - 1).date;
-//                currentName = nameOnlySeries.get(0).siteName;
-//                Log.d("onCreate: ", currentName);
 
                 int n = 0;
                 Log.d("onPostExecute: ", "MADE IT TO PRE LOOP");
@@ -140,19 +154,23 @@ public class MarineGraphActivity extends AppCompatActivity {
 
                     Log.d("onPostExecute: ", Integer.toString(tidalEntries.size()));
                     String remove = "-";
-                    String rawTide = tidalEntries.get(j).tidePrediction;
-                    String finalTide;
-                    if (rawTide.substring(0, 1).equals("-")) {
-                        finalTide = tidalEntries.get(j).tidePrediction.replace(remove, "");
-                        Log.d("nononono: ", finalTide);
-                    } else {
-                        finalTide = "-" + tidalEntries.get(j).tidePrediction;
-                        Log.d("-----: ", finalTide);
+                    String finalTide = tidalEntries.get(j).tidePrediction;
+
+                    if (hilo = false) {
+
+                        if (finalTide.substring(0, 1).equals("-")) {
+                            finalTide = tidalEntries.get(j).tidePrediction.replace(remove, "");
+                            Log.d("nononono: ", finalTide);
+                        } else {
+                            finalTide = "-" + tidalEntries.get(j).tidePrediction;
+                            Log.d("-----: ", finalTide);
+                        }
                     }
 
-                    String date = tidalEntries.get(j).date;
+                    String[] splitDate = tidalEntries.get(j).date.split("-");
+                    String date = splitDate[1] + "-" + splitDate[2];
 
-                    Log.d("onPostExecute: ", date + ", " + rawTide);
+                    Log.d("onPostExecute: ", date + ", " + finalTide);
 
                     array3.add(finalTide);
                     array4.add(date);
@@ -167,14 +185,13 @@ public class MarineGraphActivity extends AppCompatActivity {
                     Double tidePrediction = Double.parseDouble(array3.get(i));
                     String newStringDate = array4.get(i);
 
-                    dp[i] = new DataPoint(new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(newStringDate), tidePrediction);
+                    dp[i] = new DataPoint(new SimpleDateFormat("MM-dd HH:mm").parse(newStringDate), tidePrediction);
 
                     Log.d("did i make it here: ", dp[i].toString());
                 }
 
                 series = new LineGraphSeries<>(dp);
 
-//                series.appendData(finalDataPoint, true, 30);
                 graphView.addSeries(series);
 
                 NumberFormat nf = NumberFormat.getInstance();
@@ -194,17 +211,6 @@ public class MarineGraphActivity extends AppCompatActivity {
                         }
                     }
                 });
-//                graphView.setTitle(tidalEntries.get(0).tidePrediction);
-
-                //"Most current reading on " + currentDate + " at " + currentValue);
-
-//                if (tidalEntries.get(0).highLow.length() > 40) {
-//                    graphView.setTitleTextSize(35);
-//                } else {
-//                    graphView.setTitleTextSize(50);
-//                }
-
-//                graphView.getGridLabelRenderer().setHumanRounding(false);
 
                 series.setColor(Color.WHITE);
                 series.setThickness(8);
@@ -212,23 +218,34 @@ public class MarineGraphActivity extends AppCompatActivity {
                 graphView.getGridLabelRenderer().setGridStyle(GridLabelRenderer.GridStyle.BOTH);
 
                 graphView.getGridLabelRenderer().setTextSize(35f);
-                graphView.getGridLabelRenderer().setNumHorizontalLabels(tidalEntries.size());
+                if (hilo = false) {
+                    graphView.getGridLabelRenderer().setNumHorizontalLabels(array4.size());
+                } else {
+                    graphView.getGridLabelRenderer().setNumHorizontalLabels(10);
 
-                //                graphView.getGridLabelRenderer().setHorizontalLabelsVisible(true);
-                // globally
+                }
+                graphView.getGridLabelRenderer().setHorizontalLabelsAngle(90);
+
+                Date date1 = new SimpleDateFormat("MM-dd HH:mm").parse(array4.get(0));
+                Date date2 = new SimpleDateFormat("MM-dd HH:mm").parse(array4.get(array4.size() - 1));
+
+                graphView.getViewport().setMinX(date1.getTime());
+                graphView.getViewport().setMaxX(date2.getTime());
+                graphView.getViewport().setXAxisBoundsManual(true);
+
                 TextView myAwesomeTextView = (TextView) findViewById(R.id.textView4);
-//                myAwesomeTextView.setText(currentValue + " ft3/s on " + currentDate);
 
                 TextView mostRecentDate = (TextView) findViewById(R.id.textView2);
-//                mostRecentDate.setText(currentDate + "  ");
 
                 TextView earliestDate = (TextView) findViewById(R.id.textView3);
-//                earliestDate.setText("      " + array3.get(0));
 
             } catch (ParseException pe) {
                 pe.printStackTrace();
             }
+
         }
+
+
     }
 }
 
